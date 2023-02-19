@@ -6,8 +6,8 @@
 // Package cli contains utilities for command line tools and server main()s
 // to handle flags, arguments, version, logging ([fortio.org/log]), etc...
 // Configure using the package variables (at minimum [MinArgs] unless your
-// binary only accepts flags), setup additional [flag]s before calling
-// [Main] or [fortio.org/scli.ServerMain()] for configmap and dynamic flags
+// binary only accepts flags), setup additional [flag] before calling
+// [Main] or [fortio.org/scli.ServerMain] for configmap and dynamic flags
 // setup.
 package cli // import "fortio.org/cli"
 
@@ -63,7 +63,7 @@ func usage(w io.Writer, msg string, args ...any) {
 
 // Main handles your commandline and flag parsing. Sets up flags first then call Main.
 // For a server with dynamic flags, call ServerMain instead.
-// Will either have called ExitFunction() (defaults to [os.Exit])
+// Will either have called [ExitFunction] (defaults to [os.Exit])
 // or returned if all validations passed.
 func Main() {
 	quietFlag := flag.Bool("quiet", false, "Quiet mode, sets log level to warning")

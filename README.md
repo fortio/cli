@@ -1,3 +1,7 @@
+[![Go Reference](https://pkg.go.dev/badge/fortio.org/cli.svg)](https://pkg.go.dev/fortio.org/cli)
+[![Go Report Card](https://goreportcard.com/badge/fortio.org/cli)](https://goreportcard.com/report/fortio.org/cli)
+[![GitHub Release](https://img.shields.io/github/release/fortio/cli.svg?style=flat)](https://github.com/fortio/cli/releases/)
+
 # cli
 Reduce boiler plate needed on each new Golang main functions (Command Line Interface) for both tools and servers (use [fortio.org/scli ServerMain()](https://github.com/fortio/scli#scli) for server)
 
