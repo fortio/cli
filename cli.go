@@ -94,7 +94,7 @@ func Main() bool {
 	if nArgs == 1 {
 		switch strings.ToLower(flag.Arg(0)) {
 		case "version":
-			fmt.Print(Config.ShortVersion)
+			fmt.Println(Config.ShortVersion)
 			ExitFunction(0)
 		case "buildinfo":
 			fmt.Print(Config.FullVersion)
