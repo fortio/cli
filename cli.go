@@ -118,19 +118,31 @@ func Main() bool {
 			ExitFunction(0)
 		}
 	}
+	argsRange := (Config.MinArgs != Config.MaxArgs)
+	exactly := "Exactly"
 	if nArgs < Config.MinArgs {
-		return ErrUsage("At least %d arguments expected, got %d", Config.MinArgs, nArgs)
+		if argsRange {
+			exactly = "At least"
+		}
+		return ErrArgCount(exactly, Config.MinArgs, nArgs)
 	}
 	if Config.MaxArgs >= 0 && nArgs > Config.MaxArgs {
 		if Config.MaxArgs <= 0 {
 			return ErrUsage("No arguments expected (except for version, buildinfo or help and -flags), got %d", nArgs)
 		}
-		return ErrUsage("At most %d arguments expected, got %d", Config.MaxArgs, nArgs)
+		if argsRange {
+			exactly = "At most"
+		}
+		return ErrArgCount(exactly, Config.MaxArgs, nArgs)
 	}
 	if *QuietFlag {
 		log.SetLogLevelQuiet(log.Warning)
 	}
 	return true
+}
+
+func ErrArgCount(prefix string, expected, actual int) bool {
+	return ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
 }
 
 // ServerMain returns true if a config port server has been started
@@ -165,4 +177,20 @@ func ServerMain() bool {
 	}
 	log.Printf("Starting %s %s", Config.ProgramName, Config.LongVersion)
 	return hasStartedServer
+}
+
+// Plural adds an "s" to the noun if i is not 1.
+func Plural(i int, noun string) string {
+	return PluralExt(i, noun, "s")
+}
+
+// PluralExt returns the noun with an extension if i is not 1.
+// Eg:
+// PluralExt(1, "address", "es") -> "address"
+// PluralExt(3 /* or 0 */, "address", "es") -> "addresses"
+func PluralExt(i int, noun string, ext string) string {
+	if i == 1 {
+		return noun
+	}
+	return noun + ext
 }
