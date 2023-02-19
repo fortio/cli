@@ -3,6 +3,7 @@ Reduce boiler plate needed on each new Golang main functions (Command Line Inter
 
 It abstracts the repetitive parts of a `main()` command line tool, flag parsing, usage, etc...
 
+You can see real use example in a tool like [multicurl](https://github.com/fortio/multicurl) or a server like [proxy](https://github.com/fortio/proxy).
 
 ## Tool Example
 Client/Tool example (no dynamic flag url or config) [sampleTool](sampleTool/main.go)
