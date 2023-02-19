@@ -59,23 +59,16 @@ $ sampleTool a b
 e.g
 
 ```bash
-$ go install fortio.org/cli/sampleServer@latest
-go: downloading fortio.org/cli v0.1.0
-$ sampleServer buildinfo
-0.1.0 h1:M+coC8So/41xSyGiiJ/6RS+XhnshNUslZuaB6H8z9GI= go1.19.6 arm64 darwin
+% go install github.com/fortio/multicurl@latest
+go: downloading github.com/fortio/multicurl v1.10.1
+% multicurl buildinfo
+1.10.1 h1:h9yM3XplwG7JWtVaSS0eJPiDmCJfnxvj3w+yoAMWMo4= go1.19.6 arm64 darwin
 go	go1.19.6
-path	fortio.org/cli/sampleServer
-mod	fortio.org/cli	v0.1.0	h1:M+coC8So/41xSyGiiJ/6RS+XhnshNUslZuaB6H8z9GI=
-dep	fortio.org/dflag	v1.4.1	h1:WDhlHMh3yrQFrvspyN5YEyr8WATdKM2dUJlTxsjCDtI=
-dep	fortio.org/fortio	v1.50.1	h1:5FSttAHQsyAsi3dzxDmSByfzDYByrWY/yw53bqOg+Kc=
+path	github.com/fortio/multicurl
+mod	github.com/fortio/multicurl	v1.10.1	h1:h9yM3XplwG7JWtVaSS0eJPiDmCJfnxvj3w+yoAMWMo4=
+dep	fortio.org/cli	v0.6.1	h1:V9L6ly4oz4fJjeQ5745FulIMsFAwFZvLPSUN+cKUrKk=
 dep	fortio.org/log	v1.2.2	h1:vs42JjNwiqbMbacittZjJE9+oi72Za6aekML9gKmILg=
 dep	fortio.org/version	v1.0.2	h1:8NwxdX58aoeKx7T5xAPO0xlUu1Hpk42nRz5s6e6eKZ0=
-dep	github.com/fsnotify/fsnotify	v1.6.0	h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
-dep	github.com/google/uuid	v1.3.0	h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
-dep	golang.org/x/exp	v0.0.0-20230213192124-5e25df0256eb	h1:PaBZQdo+iSDyHT053FjUCgZQ/9uqVwPOcl7KSWhKn6w=
-dep	golang.org/x/net	v0.7.0	h1:rJrUqqhjsgNp7KqAIc25s9pZnjU7TUcSY7HcVZjdn1g=
-dep	golang.org/x/sys	v0.5.0	h1:MUK/U/4lj1t1oPg0HfuXDN/Z1wv31ZJ/YcPiGccS4DU=
-dep	golang.org/x/text	v0.7.0	h1:4BRB4x83lYWy72KwLD/qYDuTu7q9PjSagHvijDw7cLo=
 build	-compiler=gc
 build	CGO_ENABLED=1
 build	CGO_CFLAGS=
@@ -88,16 +81,13 @@ build	GOOS=darwin
 
 ### help
 ```bash
-$ sampleServer help
-sampleServer 0.1.0 usage:
-	sampleServer [flags] arg1 arg2 [arg3...arg4]
+% multicurl help
+Fortio multicurl 1.10.1 usage:
+	multicurl [flags] url
 or 1 of the special arguments
-	sampleServer {help|version|buildinfo}
+	multicurl {help|version|buildinfo}
 flags:
-  -config-dir directory
-    	Config directory to watch for dynamic flag changes
-  -config-port port
-    	Config port to open for dynamic flag UI/api
+[...]
   -loglevel level
     	log level, one of [Debug Verbose Info Warning Error Critical Fatal] (default Info)
   -quiet
@@ -107,6 +97,6 @@ flags:
 ### version
 Short 'numeric' version (v skipped, useful for docker image tags etc)
 ```bash
-$ sampleServer version
-0.1.1
+ % multicurl version
+1.10.1
 ```
