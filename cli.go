@@ -20,10 +20,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"fortio.org/dflag/configmap"
-	"fortio.org/dflag/dynloglevel"
-	"fortio.org/dflag/endpoint"
-	"fortio.org/fortio/fhttp"
 	"fortio.org/log"
 	"fortio.org/version"
 )
@@ -153,38 +149,6 @@ func Main() {
 
 func ErrArgCount(prefix string, expected, actual int) bool {
 	return ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
-}
-
-// ServerMain returns true if a config port server has been started
-// caller needs to select {} after its own code is ready.
-// Will have called ExitFunction (ie exited) if there are usage errors
-// (wrong number of arguments, bad flags etc...).
-// It sets up (optional) config-dir to watch and listen on config-port for dynamic flag
-// changes and UI/api.
-func ServerMain() bool {
-	configDir := flag.String("config-dir", "", "Config `directory` to watch for dynamic flag changes")
-	configPort := flag.String("config-port", "", "Config `port` to open for dynamic flag UI/api")
-	dynloglevel.LoggerFlagSetup("loglevel")
-	ServerMode = true
-	Main() // will call ExitFunction() if there are usage errors
-	if *configDir != "" {
-		if _, err := configmap.Setup(flag.CommandLine, *configDir); err != nil {
-			log.Critf("Unable to watch config/flag changes in %v: %v", *configDir, err)
-		}
-	}
-	hasStartedServer := false
-	if *configPort != "" {
-		mux, addr := fhttp.HTTPServer("config", *configPort) // err already logged
-		if addr != nil {
-			hasStartedServer = true
-			setURL := "/set"
-			ep := endpoint.NewFlagsEndpoint(flag.CommandLine, setURL)
-			mux.HandleFunc("/", ep.ListFlags)
-			mux.HandleFunc(setURL, ep.SetFlag)
-		}
-	}
-	log.Printf("Starting %s %s", ProgramName, LongVersion)
-	return hasStartedServer
 }
 
 // Plural adds an "s" to the noun if i is not 1.
