@@ -36,6 +36,8 @@ func Main() int {
 $ sampleTool a
 sampleTool 1.0.0 usage:
 	sampleTool [flags] arg1 arg2 [arg3...arg4]
+or 1 of the special arguments
+	sampleTool {help|version|buildinfo}
 flags:
   -loglevel level
     	log level, one of [Debug Verbose Info Warning Error Critical Fatal] (default Info)
@@ -114,6 +116,8 @@ build	GOOS=darwin
 $ sampleServer help
 sampleServer 0.1.0 usage:
 	sampleServer [flags] arg1 arg2 [arg3...arg4]
+or 1 of the special arguments
+	sampleServer {help|version|buildinfo}
 flags:
   -config-dir directory
     	Config directory to watch for dynamic flag changes

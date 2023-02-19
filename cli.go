@@ -40,6 +40,7 @@ type Configuration struct {
 	ArgsHelp string
 	MinArgs  int // Minimum number of arguments expected
 	MaxArgs  int // Maximum number of arguments expected. 0 means same as MinArgs. -1 means no limit.
+	baseExe  string
 }
 
 var (
@@ -54,11 +55,13 @@ var (
 )
 
 func Usage(w io.Writer, msg string, args ...any) {
-	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s [flags]%s\nflags:\n",
+	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s [flags]%s\nor 1 of the special arguments\n\t%s {help|version|buildinfo}\nflags:\n",
 		Config.ProgramName,
 		Config.ShortVersion,
+		Config.baseExe,
+		Config.ArgsHelp,
 		os.Args[0],
-		Config.ArgsHelp)
+	)
 	flag.CommandLine.SetOutput(w)
 	flag.PrintDefaults()
 	if msg != "" {
@@ -82,8 +85,9 @@ func ErrUsage(msg string, args ...any) bool {
 func Main() bool {
 	Config.ShortVersion, Config.LongVersion, Config.FullVersion = version.FromBuildInfo()
 	log.Config.FatalExit = ExitFunction
+	Config.baseExe = filepath.Base(os.Args[0])
 	if Config.ProgramName == "" {
-		Config.ProgramName = filepath.Base(os.Args[0])
+		Config.ProgramName = Config.baseExe
 	}
 	if Config.MaxArgs == 0 {
 		Config.MaxArgs = Config.MinArgs
