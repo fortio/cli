@@ -5,11 +5,10 @@
 
 // Package cli contains utilities for command line tools and server main()s
 // to handle flags, arguments, version, logging ([fortio.org/log]), etc...
-// And for [ServerMain] the setup of a confimap/directory watch for flags
-// and a config endpoint (uses [fortio.org/dflag]).
 // Configure using the package variables (at minimum [MinArgs] unless your
 // binary only accepts flags), setup additional [flag]s before calling
-// [Main] or [ServerMain].
+// [Main] or [fortio.org/scli.ServerMain()] for configmap and dynamic flags
+// setup.
 package cli // import "fortio.org/cli"
 
 import (
