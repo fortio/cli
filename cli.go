@@ -7,7 +7,8 @@
 // to handle flags, arguments, version, logging ([fortio.org/log]), etc...
 // And for [ServerMain] the setup of a confimap/directory watch for flags
 // and a config endpoint (uses [fortio.org/dflag]).
-// Configure [Config], setup additional [flag]s before calling [Main] or [ServerMain].
+// Configure [Config] ([Configuration] fields), setup additional [flag]s
+// before calling [Main] or [ServerMain].
 package cli // import "fortio.org/cli"
 
 import (
@@ -26,7 +27,8 @@ import (
 	"fortio.org/version"
 )
 
-type cliConfig struct {
+// Configuration for your Main() or ServerMain() function.
+type Configuration struct {
 	// Will be filled automatically by the cli package, using fortio.org/version FromBuildInfo().
 	ShortVersion string // x.y.z from tag/install
 	LongVersion  string // version plus go version plus OS/arch
@@ -37,13 +39,13 @@ type cliConfig struct {
 	// can include \n for additional details in the Usage() before the flags are dumped.
 	ArgsHelp string
 	MinArgs  int // Minimum number of arguments expected
-	MaxArgs  int // Maximum number of arguments expected
+	MaxArgs  int // Maximum number of arguments expected. 0 means same as MinArgs. -1 means no limit.
 }
 
 var (
 	// Config is how to setup the arguments, flags and usage parsing for [Main] and [ServerMain].
-	// At minium set the MinArgs and MaxArgs fields.
-	Config    cliConfig
+	// At minium set the MinArgs and MaxArgs fields. See [Configuration] for the fields.
+	Config    Configuration
 	QuietFlag = flag.Bool("quiet", false, "Quiet mode, sets log level to warning")
 	// If not set to true, will setup static loglevel flag and logger output for client tools.
 	ServerMode = false
@@ -83,11 +85,16 @@ func Main() bool {
 	if Config.ProgramName == "" {
 		Config.ProgramName = filepath.Base(os.Args[0])
 	}
+	if Config.MaxArgs == 0 {
+		Config.MaxArgs = Config.MinArgs
+	}
 	if Config.ArgsHelp == "" {
 		for i := 1; i <= Config.MinArgs; i++ {
 			Config.ArgsHelp += fmt.Sprintf(" arg%d", i)
 		}
-		if Config.MaxArgs > Config.MinArgs {
+		if Config.MaxArgs < 0 {
+			Config.ArgsHelp += " ..."
+		} else if Config.MaxArgs > Config.MinArgs {
 			Config.ArgsHelp += fmt.Sprintf(" [arg%d...arg%d]", Config.MinArgs+1, Config.MaxArgs)
 		}
 	}
@@ -114,7 +121,7 @@ func Main() bool {
 	if nArgs < Config.MinArgs {
 		return ErrUsage("At least %d arguments expected, got %d", Config.MinArgs, nArgs)
 	}
-	if nArgs > Config.MaxArgs {
+	if Config.MaxArgs >= 0 && nArgs > Config.MaxArgs {
 		if Config.MaxArgs <= 0 {
 			return ErrUsage("No arguments expected (except for version, buildinfo or help and -flags), got %d", nArgs)
 		}
