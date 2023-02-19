@@ -3,6 +3,11 @@
 // (c) 2023 Fortio Authors
 // See LICENSE
 
+// Package cli contains utilities for command line tools and server main()s
+// to handle flags, arguments, version, logging ([fortio.org/log]), etc...
+// And for [ServerMain] the setup of a confimap/directory watch for flags
+// and a config endpoint (uses [fortio.org/dflag]).
+// Configure [Config], setup additional [flag]s before calling [Main] or [ServerMain].
 package cli // import "fortio.org/cli"
 
 import (
@@ -36,6 +41,8 @@ type cliConfig struct {
 }
 
 var (
+	// Config is how to setup the arguments, flags and usage parsing for [Main] and [ServerMain].
+	// At minium set the MinArgs and MaxArgs fields.
 	Config    cliConfig
 	QuietFlag = flag.Bool("quiet", false, "Quiet mode, sets log level to warning")
 	// If not set to true, will setup static loglevel flag and logger output for client tools.
@@ -122,6 +129,8 @@ func Main() bool {
 // ServerMain returns true if a config port server has been started
 // caller needs to select {} after its own code is ready.
 // Will have exited if there are usage errors (wrong number of arguments, bad flags etc...).
+// It sets up (optional) config-dir to watch and listen on config-port for dynamic flag
+// changes and UI/api.
 func ServerMain() bool {
 	ConfigDir := flag.String("config-dir", "", "Config `directory` to watch for dynamic flag changes")
 	ConfigPort := flag.String("config-port", "", "Config `port` to open for dynamic flag UI/api")
