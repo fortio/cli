@@ -45,7 +45,7 @@ var (
 	baseExe      string
 )
 
-func Usage(w io.Writer, msg string, args ...any) {
+func usage(w io.Writer, msg string, args ...any) {
 	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s [flags]%s\nor 1 of the special arguments\n\t%s {help|version|buildinfo}\nflags:\n",
 		ProgramName,
 		ShortVersion,
@@ -59,14 +59,6 @@ func Usage(w io.Writer, msg string, args ...any) {
 		fmt.Fprintf(w, msg, args...)
 		fmt.Fprintln(w)
 	}
-}
-
-// Show usage and error message on stderr and exit with code 1 or returns false.
-func ErrUsage(msg string, args ...any) bool {
-	Usage(os.Stderr, msg, args...)
-	ExitFunction(1)
-	// not reached, typically
-	return false
 }
 
 // Main handles your commandline and flag parsing. Sets up flags first then call Main.
@@ -102,7 +94,7 @@ func Main() {
 		log.SetDefaultsForClientTools()
 		log.LoggerStaticFlagSetup("loglevel")
 	}
-	flag.CommandLine.Usage = func() { Usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
+	flag.CommandLine.Usage = func() { usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
 	flag.Parse()
 	nArgs := len(flag.Args())
 	if nArgs == 1 {
@@ -116,7 +108,7 @@ func Main() {
 			ExitFunction(0)
 			return // not typically reached, unless ExitFunction doesn't exit
 		case "help":
-			Usage(os.Stdout, "")
+			usage(os.Stdout, "")
 			ExitFunction(0)
 			return // not typically reached, unless ExitFunction doesn't exit
 		}
@@ -127,7 +119,7 @@ func Main() {
 		if argsRange {
 			exactly = "At least"
 		}
-		ErrArgCount(exactly, MinArgs, nArgs)
+		errArgCount(exactly, MinArgs, nArgs)
 		return // not typically reached, unless ExitFunction doesn't exit
 	}
 	if MaxArgs >= 0 && nArgs > MaxArgs {
@@ -138,7 +130,7 @@ func Main() {
 		if argsRange {
 			exactly = "At most"
 		}
-		ErrArgCount(exactly, MaxArgs, nArgs)
+		errArgCount(exactly, MaxArgs, nArgs)
 		return // not typically reached, unless ExitFunction doesn't exit
 	}
 	if *quietFlag {
@@ -146,8 +138,16 @@ func Main() {
 	}
 }
 
-func ErrArgCount(prefix string, expected, actual int) bool {
+func errArgCount(prefix string, expected, actual int) bool {
 	return ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
+}
+
+// Show usage and error message on stderr and exit with code 1 or returns false.
+func ErrUsage(msg string, args ...any) bool {
+	usage(os.Stderr, msg, args...)
+	ExitFunction(1)
+	// not reached, typically
+	return false
 }
 
 // Plural adds an "s" to the noun if i is not 1.
