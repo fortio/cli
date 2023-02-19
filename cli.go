@@ -102,6 +102,10 @@ func Main() bool {
 			Config.ArgsHelp += fmt.Sprintf(" [arg%d...arg%d]", Config.MinArgs+1, Config.MaxArgs)
 		}
 	}
+	// Callers can pass that part of the help with or without leading space
+	if !strings.HasPrefix(Config.ArgsHelp, " ") {
+		Config.ArgsHelp = " " + Config.ArgsHelp
+	}
 	if !ServerMode {
 		log.SetDefaultsForClientTools()
 		log.LoggerStaticFlagSetup("loglevel")
