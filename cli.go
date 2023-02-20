@@ -9,6 +9,7 @@
 // binary only accepts flags), setup additional [flag] before calling
 // [Main] or [fortio.org/scli.ServerMain] for configmap and dynamic flags
 // setup.
+// Also supports (sub)commands style, see [CommandBeforeFlags] and [Command].
 package cli // import "fortio.org/cli"
 
 import (

@@ -9,6 +9,8 @@ It abstracts the repetitive parts of a `main()` command line tool, flag parsing,
 
 You can see real use example in a tool like [multicurl](https://github.com/fortio/multicurl) or a server like [proxy](https://github.com/fortio/proxy).
 
+It also supports (sub)commands style (where there is a word/command before the flags and remaining arguments, [fortio](https://github.com/fortio/fortio) uses that mode).
+
 ## Tool Example
 Client/Tool example (no dynamic flag url or config) [sampleTool](sampleTool/main.go)
 
