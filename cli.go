@@ -129,9 +129,9 @@ func Main() {
 		}
 		Command = os.Args[1]
 		os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
-		nArgs--
 	}
 	flag.Parse()
+	nArgs = len(flag.Args())
 	argsRange := (MinArgs != MaxArgs)
 	exactly := "Exactly"
 	if nArgs < MinArgs {
