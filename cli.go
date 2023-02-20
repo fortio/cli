@@ -162,7 +162,7 @@ func errArgCount(prefix string, expected, actual int) {
 	ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
 }
 
-// Show usage and error message on stderr and exit with code 1 or returns false.
+// Show usage and error message on stderr and calls ExitFunction with code 1.
 func ErrUsage(msg string, args ...any) {
 	usage(os.Stderr, msg, args...)
 	ExitFunction(1)
