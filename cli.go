@@ -9,6 +9,7 @@
 // binary only accepts flags), setup additional [flag] before calling
 // [Main] or [fortio.org/scli.ServerMain] for configmap and dynamic flags
 // setup.
+// Also supports (sub)commands style, see [CommandBeforeFlags] and [Command].
 package cli // import "fortio.org/cli"
 
 import (
@@ -27,16 +28,20 @@ import (
 // These variables is how to setup the arguments, flags and usage parsing for [Main] and [ServerMain].
 // At minium set the MinArgs should be set.
 var (
+	// Out parameters:
 	// *Version will be filled automatically by the cli package, using [fortio.org/version.FromBuildInfo()].
 	ShortVersion string // x.y.z from tag/install
 	LongVersion  string // version plus go version plus OS/arch
 	FullVersion  string // LongVersion plus build date and git sha
+	Command      string // first argument, if [CommandBeforeFlags] is true.
 	// Following can/should be specified.
 	ProgramName string // Used at the beginning of Usage()
+	// Optional for programs using subcommand, command will be set in [Command].
+	CommandBeforeFlags bool
 	// Cli usage/arguments example, ie "url1..." program name and "[flags]" will be added"
 	// can include \n for additional details in the Usage() before the flags are dumped.
 	ArgsHelp string
-	MinArgs  int // Minimum number of arguments expected
+	MinArgs  int // Minimum number of arguments expected, not counting (optional) command.
 	MaxArgs  int // Maximum number of arguments expected. 0 means same as MinArgs. -1 means no limit.
 	// If not set to true, will setup static loglevel flag and logger output for client tools.
 	ServerMode = false
@@ -46,10 +51,15 @@ var (
 )
 
 func usage(w io.Writer, msg string, args ...any) {
-	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s [flags]%s\nor 1 of the special arguments\n\t%s {help|version|buildinfo}\nflags:\n",
+	cmd := ""
+	if CommandBeforeFlags {
+		cmd = "command "
+	}
+	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s %s[flags]%s\nor 1 of the special arguments\n\t%s {help|version|buildinfo}\nflags:\n",
 		ProgramName,
 		ShortVersion,
 		baseExe,
+		cmd,
 		ArgsHelp,
 		os.Args[0],
 	)
@@ -66,7 +76,8 @@ func usage(w io.Writer, msg string, args ...any) {
 // Will either have called [ExitFunction] (defaults to [os.Exit])
 // or returned if all validations passed.
 func Main() {
-	quietFlag := flag.Bool("quiet", false, "Quiet mode, sets log level to warning")
+	quietFlag := flag.Bool("quiet", false,
+		"Quiet mode, sets loglevel to Error (quietly) to reduces the output")
 	ShortVersion, LongVersion, FullVersion = version.FromBuildInfo()
 	log.Config.FatalExit = ExitFunction
 	baseExe = filepath.Base(os.Args[0])
@@ -95,10 +106,9 @@ func Main() {
 		log.LoggerStaticFlagSetup("loglevel")
 	}
 	flag.CommandLine.Usage = func() { usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
-	flag.Parse()
-	nArgs := len(flag.Args())
-	if nArgs == 1 {
-		switch strings.ToLower(flag.Arg(0)) {
+	nArgs := len(os.Args)
+	if nArgs == 2 {
+		switch strings.ToLower(os.Args[1]) {
 		case "version":
 			fmt.Println(ShortVersion)
 			ExitFunction(0)
@@ -113,6 +123,16 @@ func Main() {
 			return // not typically reached, unless ExitFunction doesn't exit
 		}
 	}
+	if CommandBeforeFlags {
+		if nArgs == 1 {
+			ErrUsage("Missing command argument")
+			return // not typically reached, unless ExitFunction doesn't exit
+		}
+		Command = os.Args[1]
+		os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
+	}
+	flag.Parse()
+	nArgs = len(flag.Args())
 	argsRange := (MinArgs != MaxArgs)
 	exactly := "Exactly"
 	if nArgs < MinArgs {
@@ -134,20 +154,18 @@ func Main() {
 		return // not typically reached, unless ExitFunction doesn't exit
 	}
 	if *quietFlag {
-		log.SetLogLevelQuiet(log.Warning)
+		log.SetLogLevelQuiet(log.Error)
 	}
 }
 
-func errArgCount(prefix string, expected, actual int) bool {
-	return ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
+func errArgCount(prefix string, expected, actual int) {
+	ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
 }
 
-// Show usage and error message on stderr and exit with code 1 or returns false.
-func ErrUsage(msg string, args ...any) bool {
+// Show usage and error message on stderr and calls [ExitFunction] with code 1.
+func ErrUsage(msg string, args ...any) {
 	usage(os.Stderr, msg, args...)
 	ExitFunction(1)
-	// not reached, typically
-	return false
 }
 
 // Plural adds an "s" to the noun if i is not 1.
