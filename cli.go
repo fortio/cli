@@ -106,8 +106,8 @@ func Main() {
 	}
 	flag.CommandLine.Usage = func() { usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
 	nArgs := len(os.Args)
-	if nArgs == 1 {
-		switch strings.ToLower(flag.Arg(0)) {
+	if nArgs == 2 {
+		switch strings.ToLower(os.Args[1]) {
 		case "version":
 			fmt.Println(ShortVersion)
 			ExitFunction(0)
