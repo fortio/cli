@@ -112,7 +112,7 @@ flags:
   -loglevel level
     	log level, one of [Debug Verbose Info Warning Error Critical Fatal] (default Info)
   -quiet
-    	Quiet mode, sets log level to warning
+    	Quiet mode, sets loglevel to Error (quietly) to reduces the output
 ```
 
 ### version
