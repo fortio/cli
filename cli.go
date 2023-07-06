@@ -78,6 +78,10 @@ func usage(w io.Writer, msg string, args ...any) {
 func Main() {
 	quietFlag := flag.Bool("quiet", false,
 		"Quiet mode, sets loglevel to Error (quietly) to reduces the output")
+	flag.BoolVar(&log.Config.ForceColor, "logger-force-color", false,
+		"Force color output even if stderr isn't a terminal")
+	nocolor := flag.Bool("logger-no-color", false,
+		"Prevent colorized output even if stderr is a terminal")
 	ShortVersion, LongVersion, FullVersion = version.FromBuildInfo()
 	log.Config.FatalExit = ExitFunction
 	baseExe = filepath.Base(os.Args[0])
@@ -132,6 +136,8 @@ func Main() {
 		os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
 	}
 	flag.Parse()
+	log.Config.ConsoleColor = !*nocolor
+	log.SetColorMode()
 	nArgs = len(flag.Args())
 	argsRange := (MinArgs != MaxArgs)
 	exactly := "Exactly"

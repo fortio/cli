@@ -31,31 +31,42 @@ func main() {
 	cli.Main() // Will have either called cli.ExitFunction or everything is valid
 	// Next line output won't show when passed -quiet
 	log.Infof("Info test, -myflag is %q", *myFlag)
+	// This always shows
 	log.Printf("Hello world, version %s, args %v", cli.ShortVersion, flag.Args())
+	// This shows and is colorized and structured, unless loglevel is set to critical.
+	log.S(log.Error, "Error test",
+		log.Str("myflag", *myFlag),
+		log.Attr("num_args", len(flag.Args())),
+		log.Attr("args", flag.Args()))
 }
 ```
 
 ```bash
 $ sampleTool a
-sampleTool 1.0.0 usage:
+sampleTool 1.2.0 usage:
 	sampleTool [flags] arg1 arg2 [arg3...arg4]
 or 1 of the special arguments
 	sampleTool {help|version|buildinfo}
 flags:
+  -logger-force-color
+    	Force color output even if stderr isn't a terminal
+  -logger-no-color
+    	Prevent colorized output even if stderr is a terminal
   -loglevel level
     	log level, one of [Debug Verbose Info Warning Error Critical Fatal] (default Info)
   -myflag string
     	my flag (default "default")
   -quiet
-    	Quiet mode, sets log level to warning
+    	Quiet mode, sets loglevel to Error (quietly) to reduces the output
 At least 2 arguments expected, got 1
 ```
 
-or normal case
+or normal case (and now in color when on console)
 ```bash
 $ sampleTool a b
-15:42:17 I Info test, -myflag is "default"
-15:42:17 Hello world, version dev, args [a b]
+15:30:50.217 I Info test, -myflag is "default"
+15:30:50.217 I Hello world, version dev, args [a b]
+15:30:50.217 E Error test, myflag="default", num_args="2", args="[a b]"
 ```
 
 ## Additional builtins
@@ -94,6 +105,10 @@ or 1 of the special arguments
 	multicurl {help|version|buildinfo}
 flags:
 [...]
+  -logger-force-color
+    	Force color output even if stderr isn't a terminal
+  -logger-no-color
+    	Prevent colorized output even if stderr is a terminal
   -loglevel level
     	log level, one of [Debug Verbose Info Warning Error Critical Fatal] (default Info)
   -quiet
