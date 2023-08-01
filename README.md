@@ -61,6 +61,10 @@ flags:
 At least 2 arguments expected, got 1
 ```
 
+Since v1.3, the above is colorized on a terminal and looks like this:
+
+![Color output](screenshot.png)
+
 or normal case (and now in color when on console)
 ```bash
 $ sampleTool a b
