@@ -50,21 +50,33 @@ var (
 	baseExe      string
 )
 
+func colorJoin(color string, args ...string) string {
+	return color + strings.Join(args, log.Colors.Reset+"|"+color) + log.Colors.Reset
+}
+
 func usage(w io.Writer, msg string, args ...any) {
 	cmd := ""
 	if CommandBeforeFlags {
-		cmd = "command "
+		cmd = log.Colors.Purple + "command " + log.Colors.Reset
 	}
-	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s %s[flags]%s\nor 1 of the special arguments\n\t%s {help|version|buildinfo}\nflags:\n",
+	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s %s["+
+		log.Colors.Cyan+"flags"+log.Colors.Reset+"]%s\nor 1 of the special arguments\n\t%s {"+
+		colorJoin(log.Colors.Purple, "help", "version", "buildinfo)")+"}\n"+"flags:\n"+log.Colors.Cyan,
 		ProgramName,
-		ShortVersion,
+		log.Colors.Blue+ShortVersion+log.Colors.Reset,
 		baseExe,
 		cmd,
 		ArgsHelp,
 		os.Args[0],
 	)
-	flag.CommandLine.SetOutput(w)
+	var buf strings.Builder
+	flag.CommandLine.SetOutput(&buf)
 	flag.PrintDefaults()
+	flags := buf.String()
+	flags = strings.ReplaceAll(flags, "(default ", log.Colors.Green+"(default ")
+	flags = strings.ReplaceAll(flags, "\n", "\n"+log.Colors.Cyan)
+	flags = strings.ReplaceAll(flags, "\t", log.Colors.Reset+"\t")
+	_, _ = w.Write([]byte(flags + log.Colors.Reset))
 	if msg != "" {
 		fmt.Fprintf(w, msg, args...)
 		fmt.Fprintln(w)
@@ -170,7 +182,7 @@ func errArgCount(prefix string, expected, actual int) {
 
 // Show usage and error message on stderr and calls [ExitFunction] with code 1.
 func ErrUsage(msg string, args ...any) {
-	usage(os.Stderr, msg, args...)
+	usage(os.Stderr, log.Colors.BrightRed+msg+log.Colors.Reset, args...)
 	ExitFunction(1)
 }
 
