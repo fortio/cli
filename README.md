@@ -63,15 +63,20 @@ At least 2 arguments expected, got 1
 
 Since v1.3, the above is colorized on a terminal and looks like this:
 
-![Color output](screenshot.png)
+![Color usage output](screenshot.png)
 
-or normal case (and now in color when on console)
+or normal case:
+
+![Color log output](screenshot2.png)
+
+Old style, no colors:
 ```bash
-$ sampleTool a b
-15:30:50.217 I Info test, -myflag is "default"
-15:30:50.217 I Hello world, version dev, args [a b]
-15:30:50.217 E Error test, myflag="default", num_args="2", args="[a b]"
+$ sampleTool -logger-no-color a b
+17:20:41 [I] Info test, -myflag is "default"
+17:20:41 Hello world, version dev, args [a b]
+17:20:41 [E] Error test, myflag="default", num_args="2", args="[a b]"
 ```
+
 
 ## Additional builtins
 
