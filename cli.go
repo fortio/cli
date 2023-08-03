@@ -59,7 +59,7 @@ func usage(w io.Writer, msg string, args ...any) {
 	if CommandBeforeFlags {
 		cmd = log.Colors.Purple + "command " + log.Colors.Reset
 	}
-	_, _ = fmt.Fprintf(w, "%s %s usage:\n\t%s %s["+
+	_, _ = fmt.Fprintf(w, log.Colors.Reset+"%s %s usage:\n\t%s %s["+
 		log.Colors.Cyan+"flags"+log.Colors.Reset+"]%s\nor 1 of the special arguments\n\t%s {"+
 		colorJoin(log.Colors.Purple, "help", "version", "buildinfo)")+"}\n"+"flags:\n"+log.Colors.Cyan,
 		ProgramName,
@@ -147,7 +147,10 @@ func Main() {
 		Command = os.Args[1]
 		os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
 	}
+	// In case of a bad flag, we want it in red when on console:
+	os.Stderr.WriteString(log.Colors.BrightRed)
 	flag.Parse()
+	os.Stderr.WriteString(log.Colors.Reset)
 	log.Config.ConsoleColor = !*nocolor
 	log.SetColorMode()
 	nArgs = len(flag.Args())
