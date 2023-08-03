@@ -61,7 +61,7 @@ func usage(w io.Writer, msg string, args ...any) {
 	}
 	_, _ = fmt.Fprintf(w, log.Colors.Reset+"%s %s usage:\n\t%s %s["+
 		log.Colors.Cyan+"flags"+log.Colors.Reset+"]%s\nor 1 of the special arguments\n\t%s {"+
-		colorJoin(log.Colors.Purple, "help", "version", "buildinfo)")+"}\n"+"flags:\n"+log.Colors.Cyan,
+		colorJoin(log.Colors.Purple, "help", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
 		ProgramName,
 		log.Colors.Blue+ShortVersion+log.Colors.Reset,
 		baseExe,
