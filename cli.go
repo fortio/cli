@@ -47,8 +47,29 @@ var (
 	ServerMode = false
 	// Override this to change the exit function (for testing), will be applied to log.Fatalf too.
 	ExitFunction = os.Exit
-	baseExe      string
+	// Hook to call before flag.Parse() - for instance to use ChangeFlagDefaults for logger flags etc.
+	BeforeFlagParseHook = func() {}
+	// Calculated base exe name from args (will be used if ProgramName if not set)
+	baseExe string
 )
+
+// ChangeFlagsDefault sets some flags to a different default.
+// Will return error if the flag is not found and value can't be set
+// (caller should likely log.Fatalf if that happens as it's a typo/bug).
+func ChangeFlagsDefault(newDefault string, flagNames ...string) error {
+	for _, flagName := range flagNames {
+		f := flag.Lookup(flagName)
+		if f == nil {
+			return fmt.Errorf("flag %q not found", flagName)
+		}
+		f.DefValue = newDefault
+		err := f.Value.Set(newDefault)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func colorJoin(color string, args ...string) string {
 	return color + strings.Join(args, log.Colors.Reset+"|"+color) + log.Colors.Reset
@@ -149,6 +170,7 @@ func Main() {
 	}
 	// In case of a bad flag, we want it in red when on console:
 	os.Stderr.WriteString(log.Colors.BrightRed)
+	BeforeFlagParseHook()
 	flag.Parse()
 	os.Stderr.WriteString(log.Colors.Reset)
 	log.Config.ConsoleColor = !*nocolor
