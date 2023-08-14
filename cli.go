@@ -49,7 +49,7 @@ var (
 	ExitFunction = os.Exit
 	// Hook to call before flag.Parse() - for instance to use ChangeFlagDefaults for logger flags etc.
 	BeforeFlagParseHook = func() {}
-	// Calculated base exe name from args (will be used if ProgramName if not set)
+	// Calculated base exe name from args (will be used if ProgramName if not set).
 	baseExe string
 )
 
