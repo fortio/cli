@@ -143,6 +143,7 @@ func Main() {
 		log.LoggerStaticFlagSetup("loglevel")
 	}
 	flag.CommandLine.Usage = func() { usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
+	BeforeFlagParseHook()
 	nArgs := len(os.Args)
 	if nArgs == 2 {
 		switch strings.ToLower(os.Args[1]) {
@@ -170,7 +171,6 @@ func Main() {
 	}
 	// In case of a bad flag, we want it in red when on console:
 	os.Stderr.WriteString(log.Colors.BrightRed)
-	BeforeFlagParseHook()
 	flag.Parse()
 	os.Stderr.WriteString(log.Colors.Reset)
 	log.Config.ConsoleColor = !*nocolor
