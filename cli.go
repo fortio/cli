@@ -37,12 +37,18 @@ var (
 	// Following can/should be specified.
 	ProgramName string // Used at the beginning of Usage()
 	// Optional for programs using subcommand, command will be set in [Command].
+	// If you wish to replace the help default colorize `command` with something else set CommandHelp.
 	CommandBeforeFlags bool
 	// Cli usage/arguments example, ie "url1..." program name and "[flags]" will be added"
 	// can include \n for additional details in the Usage() before the flags are dumped.
 	ArgsHelp string
-	MinArgs  int // Minimum number of arguments expected, not counting (optional) command.
-	MaxArgs  int // Maximum number of arguments expected. 0 means same as MinArgs. -1 means no limit.
+	// Command help will be used instead of purple "command " in help text for cli that have a
+	// command before the flags (when [CommandBeforeFlags] is true). For instance you could use
+	// cli.CommandHelp = "{" + cli.ColorJoin(log.Colors.Purple, "a", "b", "c") + "}"
+	// for colorize {a|b|c} in the help before [flags].
+	CommandHelp string
+	MinArgs     int // Minimum number of arguments expected, not counting (optional) command.
+	MaxArgs     int // Maximum number of arguments expected. 0 means same as MinArgs. -1 means no limit.
 	// If not set to true, will setup static loglevel flag and logger output for client tools.
 	ServerMode = false
 	// Override this to change the exit function (for testing), will be applied to log.Fatalf too.
@@ -71,18 +77,22 @@ func ChangeFlagsDefault(newDefault string, flagNames ...string) error {
 	return nil
 }
 
-func colorJoin(color string, args ...string) string {
+func ColorJoin(color string, args ...string) string {
 	return color + strings.Join(args, log.Colors.Reset+"|"+color) + log.Colors.Reset
 }
 
 func usage(w io.Writer, msg string, args ...any) {
 	cmd := ""
 	if CommandBeforeFlags {
-		cmd = log.Colors.Purple + "command " + log.Colors.Reset
+		if CommandHelp != "" {
+			cmd = CommandHelp + " "
+		} else {
+			cmd = log.Colors.Purple + "command " + log.Colors.Reset
+		}
 	}
 	_, _ = fmt.Fprintf(w, log.Colors.Reset+"%s %s usage:\n\t%s %s["+
 		log.Colors.Cyan+"flags"+log.Colors.Reset+"]%s\nor 1 of the special arguments\n\t%s {"+
-		colorJoin(log.Colors.Purple, "help", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
+		ColorJoin(log.Colors.Purple, "help", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
 		ProgramName,
 		log.Colors.Blue+ShortVersion+log.Colors.Reset,
 		baseExe,
