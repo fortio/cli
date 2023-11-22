@@ -197,8 +197,8 @@ func Main() {
 	os.Stderr.WriteString(log.Colors.Reset)
 	if *nocolor {
 		// Don't override the env if the flag isn't set
-		// (downside is if LOGGER_FORCE_COLOR is set to false, this -logger-no-color=false can't override it)
-		log.Config.ForceColor = !*nocolor
+		// (downside is if LOGGER_CONSOLE_COLOR is set to false, this -logger-no-color=false can't override it)
+		log.Config.ConsoleColor = false /* = !*nocolor */
 	}
 	log.SetColorMode()
 	nArgs = len(flag.Args())
