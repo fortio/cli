@@ -57,6 +57,8 @@ var (
 	BeforeFlagParseHook = func() {}
 	// Calculated base exe name from args (will be used if ProgramName if not set).
 	baseExe string
+	// List of functions to call for env help
+	EnvHelpFuncs []func(w io.Writer) = []func(w io.Writer){log.EnvHelp}
 )
 
 // ChangeFlagsDefault sets some flags to a different default.
@@ -92,7 +94,7 @@ func usage(w io.Writer, msg string, args ...any) {
 	}
 	_, _ = fmt.Fprintf(w, log.Colors.Reset+"%s %s usage:\n\t%s %s["+
 		log.Colors.Cyan+"flags"+log.Colors.Reset+"]%s\nor 1 of the special arguments\n\t%s {"+
-		ColorJoin(log.Colors.Purple, "help", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
+		ColorJoin(log.Colors.Purple, "help", "envhelp", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
 		ProgramName,
 		log.Colors.Blue+ShortVersion+log.Colors.Reset,
 		baseExe,
@@ -169,6 +171,12 @@ func Main() {
 			usage(os.Stdout, "")
 			ExitFunction(0)
 			return // not typically reached, unless ExitFunction doesn't exit
+		case "envhelp":
+			for _, f := range EnvHelpFuncs {
+				f(os.Stdout)
+			}
+			ExitFunction(0)
+			return // not typically reached, unless ExitFunction doesn't exit
 		}
 	}
 	if CommandBeforeFlags {
@@ -183,7 +191,11 @@ func Main() {
 	os.Stderr.WriteString(log.Colors.BrightRed)
 	flag.Parse()
 	os.Stderr.WriteString(log.Colors.Reset)
-	log.Config.ConsoleColor = !*nocolor
+	if *nocolor {
+		// Don't override the env if the flag isn't set
+		// (downside is if LOGGER_FORCE_COLOR is set to false, this -logger-no-color=false can't override it)
+		log.Config.ForceColor = !*nocolor
+	}
 	log.SetColorMode()
 	nArgs = len(flag.Args())
 	argsRange := (MinArgs != MaxArgs)
@@ -197,7 +209,7 @@ func Main() {
 	}
 	if MaxArgs >= 0 && nArgs > MaxArgs {
 		if MaxArgs <= 0 {
-			ErrUsage("No arguments expected (except for version, buildinfo or help and -flags), got %d", nArgs)
+			ErrUsage("No arguments expected (except for version, buildinfo, help or envhelp and -flags), got %d", nArgs)
 			return // not typically reached, unless ExitFunction doesn't exit
 		}
 		if argsRange {
