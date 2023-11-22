@@ -57,6 +57,8 @@ var (
 	BeforeFlagParseHook = func() {}
 	// Calculated base exe name from args (will be used if ProgramName if not set).
 	baseExe string
+	// List of functions to call for env help.
+	EnvHelpFuncs = []func(w io.Writer){log.EnvHelp}
 )
 
 // ChangeFlagsDefault sets some flags to a different default.
@@ -92,7 +94,7 @@ func usage(w io.Writer, msg string, args ...any) {
 	}
 	_, _ = fmt.Fprintf(w, log.Colors.Reset+"%s %s usage:\n\t%s %s["+
 		log.Colors.Cyan+"flags"+log.Colors.Reset+"]%s\nor 1 of the special arguments\n\t%s {"+
-		ColorJoin(log.Colors.Purple, "help", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
+		ColorJoin(log.Colors.Purple, "help", "envhelp", "version", "buildinfo")+"}\n"+"flags:\n"+log.Colors.Cyan,
 		ProgramName,
 		log.Colors.Blue+ShortVersion+log.Colors.Reset,
 		baseExe,
@@ -111,6 +113,13 @@ func usage(w io.Writer, msg string, args ...any) {
 	if msg != "" {
 		fmt.Fprintf(w, msg, args...)
 		fmt.Fprintln(w)
+	}
+}
+
+func EnvHelp(w io.Writer) {
+	fmt.Println("# Environment variables recognized and current values:")
+	for _, f := range EnvHelpFuncs {
+		f(w)
 	}
 }
 
@@ -156,17 +165,20 @@ func Main() {
 	BeforeFlagParseHook()
 	nArgs := len(os.Args)
 	if nArgs == 2 {
+		specialCmd := true
 		switch strings.ToLower(os.Args[1]) {
 		case "version":
 			fmt.Println(ShortVersion)
-			ExitFunction(0)
-			return // not typically reached, unless ExitFunction doesn't exit
 		case "buildinfo":
 			fmt.Print(FullVersion)
-			ExitFunction(0)
-			return // not typically reached, unless ExitFunction doesn't exit
 		case "help":
 			usage(os.Stdout, "")
+		case "envhelp":
+			EnvHelp(os.Stdout)
+		default:
+			specialCmd = false
+		}
+		if specialCmd {
 			ExitFunction(0)
 			return // not typically reached, unless ExitFunction doesn't exit
 		}
@@ -183,7 +195,11 @@ func Main() {
 	os.Stderr.WriteString(log.Colors.BrightRed)
 	flag.Parse()
 	os.Stderr.WriteString(log.Colors.Reset)
-	log.Config.ConsoleColor = !*nocolor
+	if *nocolor {
+		// Don't override the env if the flag isn't set
+		// (downside is if LOGGER_FORCE_COLOR is set to false, this -logger-no-color=false can't override it)
+		log.Config.ForceColor = !*nocolor
+	}
 	log.SetColorMode()
 	nArgs = len(flag.Args())
 	argsRange := (MinArgs != MaxArgs)
@@ -197,7 +213,7 @@ func Main() {
 	}
 	if MaxArgs >= 0 && nArgs > MaxArgs {
 		if MaxArgs <= 0 {
-			ErrUsage("No arguments expected (except for version, buildinfo or help and -flags), got %d", nArgs)
+			ErrUsage("No arguments expected (except for version, buildinfo, help or envhelp and -flags), got %d", nArgs)
 			return // not typically reached, unless ExitFunction doesn't exit
 		}
 		if argsRange {
