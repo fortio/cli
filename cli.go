@@ -172,6 +172,7 @@ func Main() {
 			ExitFunction(0)
 			return // not typically reached, unless ExitFunction doesn't exit
 		case "envhelp":
+			fmt.Println("# Environment variables recognized and current values:")
 			for _, f := range EnvHelpFuncs {
 				f(os.Stdout)
 			}
