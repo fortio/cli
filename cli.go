@@ -57,8 +57,8 @@ var (
 	BeforeFlagParseHook = func() {}
 	// Calculated base exe name from args (will be used if ProgramName if not set).
 	baseExe string
-	// List of functions to call for env help
-	EnvHelpFuncs []func(w io.Writer) = []func(w io.Writer){log.EnvHelp}
+	// List of functions to call for env help.
+	EnvHelpFuncs = []func(w io.Writer){log.EnvHelp}
 )
 
 // ChangeFlagsDefault sets some flags to a different default.
@@ -116,6 +116,13 @@ func usage(w io.Writer, msg string, args ...any) {
 	}
 }
 
+func EnvHelp(w io.Writer) {
+	fmt.Println("# Environment variables recognized and current values:")
+	for _, f := range EnvHelpFuncs {
+		f(w)
+	}
+}
+
 // Main handles your commandline and flag parsing. Sets up flags first then call Main.
 // For a server with dynamic flags, call ServerMain instead.
 // Will either have called [ExitFunction] (defaults to [os.Exit])
@@ -158,24 +165,20 @@ func Main() {
 	BeforeFlagParseHook()
 	nArgs := len(os.Args)
 	if nArgs == 2 {
+		specialCmd := true
 		switch strings.ToLower(os.Args[1]) {
 		case "version":
 			fmt.Println(ShortVersion)
-			ExitFunction(0)
-			return // not typically reached, unless ExitFunction doesn't exit
 		case "buildinfo":
 			fmt.Print(FullVersion)
-			ExitFunction(0)
-			return // not typically reached, unless ExitFunction doesn't exit
 		case "help":
 			usage(os.Stdout, "")
-			ExitFunction(0)
-			return // not typically reached, unless ExitFunction doesn't exit
 		case "envhelp":
-			fmt.Println("# Environment variables recognized and current values:")
-			for _, f := range EnvHelpFuncs {
-				f(os.Stdout)
-			}
+			EnvHelp(os.Stdout)
+		default:
+			specialCmd = false
+		}
+		if specialCmd {
 			ExitFunction(0)
 			return // not typically reached, unless ExitFunction doesn't exit
 		}
