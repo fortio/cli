@@ -1,5 +1,5 @@
-fortio.org/log v1.11.1-0.20231122031455-08c39b67f0de h1:SXOc8efqcIIYZgTe6M6zgigRtV9eKWT78mlzcyYu7hA=
-fortio.org/log v1.11.1-0.20231122031455-08c39b67f0de/go.mod h1:1tMBG/Elr6YqjmJCWiejJp2FPvXg7/9UAN0Rfpkyt1o=
+fortio.org/log v1.12.0 h1:5Yg4pL9Pp0jcWeJYixm2xikMCldVaSDMgDFDmQJZfho=
+fortio.org/log v1.12.0/go.mod h1:1tMBG/Elr6YqjmJCWiejJp2FPvXg7/9UAN0Rfpkyt1o=
 fortio.org/struct2env v0.4.0 h1:k5alSOTf3YHiB3MuacjDHQ3YhVWvNZ95ZP/a6MqvyLo=
 fortio.org/struct2env v0.4.0/go.mod h1:lENUe70UwA1zDUCX+8AsO663QCFqYaprk5lnPhjD410=
 fortio.org/version v1.0.3 h1:5gJ3plj6isAOMq52cI5ifo4cC+QHmJF76Wevc5Cp4x0=
