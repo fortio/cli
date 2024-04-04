@@ -3,7 +3,7 @@ module fortio.org/cli
 go 1.18
 
 require (
-	fortio.org/log v1.12.1
+	fortio.org/log v1.12.2
 	fortio.org/version v1.0.4
 )
 
