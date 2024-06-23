@@ -130,3 +130,13 @@ Short 'numeric' version (v skipped, useful for docker image tags etc)
  % multicurl version
 1.10.1
 ```
+
+### https/tls in FROM scratch docker images
+
+You should always try to use `FROM scratch` Docker images when possible,
+it's one of the strength of go.
+
+Using this `fortio.org/cli` as a base makes it work
+for TLS by defaulting to the bundle provided by `golang.org/x/crypto/x509roots/fallback` automatically.
+
+See https://github.com/fortio/multicurl for a good example.

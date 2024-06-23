@@ -22,7 +22,12 @@ import (
 
 	"fortio.org/log"
 	"fortio.org/version"
+	_ "golang.org/x/crypto/x509roots/fallback" // This is a base for main, see extended comment below.
 )
+
+// golang.org/x/crypto/x509roots/fallback blank import above is because this is a base for all our main package,
+// the CA bundle is needed for FROM scratch images to work with outcalls to internet valid TLS certs (https).
+// See https://github.com/fortio/multicurl/pull/146 for instance.
 
 // Configuration for your Main() or ServerMain() function.
 // These variables is how to setup the arguments, flags and usage parsing for [Main] and [ServerMain].
