@@ -137,7 +137,7 @@ You should always try to use `FROM scratch` Docker images when possible,
 it's one of the strength of go.
 
 Using this `fortio.org/cli` as a base makes it work for outcalls to internet valid TLS certs (e.g. https).
-by defaulting to the bundle provided by `golang.org/x/crypto/x509roots/fallback` automatically.
+It does this by defaulting to the bundle provided by `golang.org/x/crypto/x509roots/fallback` automatically.
 
 See https://github.com/fortio/multicurl for a good example.
 
