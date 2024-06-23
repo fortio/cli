@@ -141,4 +141,4 @@ It does this by defaulting to the bundle provided by `golang.org/x/crypto/x509ro
 
 See https://github.com/fortio/multicurl for a good example.
 
-If you do not want this behavior, build using `-tag=no_tls_fallback`.
+If you do not want this behavior, build using `-tags no_tls_fallback`.
