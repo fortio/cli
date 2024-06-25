@@ -26,7 +26,7 @@ import (
 
 // Configuration for your Main() or ServerMain() function.
 // These variables is how to setup the arguments, flags and usage parsing for [Main] and [ServerMain].
-// At minium set the MinArgs should be set.
+// At minimum the MinArgs should be set.
 var (
 	// Out parameters:
 	// *Version will be filled automatically by the cli package, using [fortio.org/version.FromBuildInfo()].
