@@ -149,4 +149,9 @@ If you application doesn't do http request/response logging at all, use `-tags n
 
 And, if you don't need any of the advanced JSON logging (which is quite likely with a cli), use `-tags no_json` the logger will still produce json structured logging just not as advanced if what you log are deep structures - this saves another 130k or so.
 
-These tags from from [fortio.org/log](https://github.com/fortio/log) v1.14 and later
+These tags are from [fortio.org/log](https://github.com/fortio/log) v1.14 and later
+
+In summary: for smallest pure local cli binaries using this package:
+```
+CGO_ENABLE=0 go build -trimpath -ldflags="-w -s" -tags no_net,no_json .
+```
