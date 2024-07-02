@@ -142,3 +142,17 @@ It does this by defaulting to the bundle provided by `golang.org/x/crypto/x509ro
 See https://github.com/fortio/multicurl for a good example.
 
 If you do not want this behavior, build using `-tags no_tls_fallback`.
+
+### Small binaries
+
+If you application doesn't do http request/response logging at all, use `-tags no_http` or `-tags no_net` (that one will also imply `no_tls_fallback`) and save 1.6 Mbytes in your binary's size (because the linker isn't smart enough to see net/http isn't actually used) (1.1Mbytes for log's no_http and 530k from the no_tls_fallback)
+
+And, if you don't need any of the advanced JSON logging (which is quite likely with a cli), use `-tags no_json` the logger will still produce json structured logging just not as advanced if what you log are deep structures - this saves another 130k or so.
+
+These tags are from [fortio.org/log](https://github.com/fortio/log) v1.14 and later
+
+In summary: for smallest pure local cli binaries using this package:
+```
+CGO_ENABLE=0 go build -trimpath -ldflags="-w -s" -tags no_net,no_json .
+```
+saves ~1.7Mbytes in total (a basic cli dependending on this package will then only be about 300k more as an hello world yet include color help, buildinfo, version, logging etc)
