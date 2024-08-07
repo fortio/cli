@@ -9,6 +9,8 @@ import (
 
 func main() {
 	myFlag := flag.String("myflag", "default", "my flag")
+	doWait := flag.Bool("wait", false, "wait for ^C before exiting")
+
 	cli.MinArgs = 2
 	cli.MaxArgs = 4
 	cli.Main() // Will have either called cli.ExitFunction or everything is valid
@@ -21,4 +23,9 @@ func main() {
 		log.Str("myflag", *myFlag),
 		log.Attr("num_args", len(flag.Args())),
 		log.Attr("args", flag.Args()))
+	if *doWait {
+		log.Infof("Waiting for ^C (or kill) to exit")
+		cli.UntilInterrupted()
+		log.Infof("Now done...")
+	}
 }
