@@ -17,8 +17,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"fortio.org/log"
 	"fortio.org/version"
@@ -252,4 +254,21 @@ func PluralExt(i int, noun string, ext string) string {
 		return noun
 	}
 	return noun + ext
+}
+
+// UntilInterrupted runs forever or until interrupted (ctrl-c or shutdown signal (kill -INT or -TERM)).
+// Kubernetes for instance sends a SIGTERM before killing a pod.
+// You can place your clean shutdown code after this call in the main().
+// This assumes there is another go routine doing something (like a server).
+func UntilInterrupted() {
+	// if UntilInterrupted is called, it implies there should be another goroutine at least.
+	// so we put back that logging (vs what log.SetDefaultsForClientTools() does).
+	log.Config.GoroutineID = true
+	// listen for interrupt signal
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	// Block until a signal is received.
+	log.LogVf("Waiting for interrupt signal...")
+	<-c
+	log.Warnf("Interrupt received.")
 }
