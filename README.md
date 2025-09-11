@@ -11,6 +11,8 @@ You can see real use example in a tool like [multicurl](https://github.com/forti
 
 It also supports (sub)commands style (where there is a word/command before the flags and remaining arguments, [fortio](https://github.com/fortio/fortio) uses that mode).
 
+If you have durations in flags, do use the 0 dependencies [fortio.org/duration Flag](https://pkg.go.dev/fortio.org/duration#Flag) along this package.
+
 ## Tool Example
 Client/Tool example (no dynamic flag url or config) [sampleTool](sampleTool/main.go)
 
