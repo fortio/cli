@@ -11,6 +11,8 @@ You can see real use example in a tool like [multicurl](https://github.com/forti
 
 It also supports (sub)commands style (where there is a word/command before the flags and remaining arguments, [fortio](https://github.com/fortio/fortio) uses that mode).
 
+If you have durations in flags, do use the 0 dependencies [fortio.org/duration Flag](https://pkg.go.dev/fortio.org/duration#Flag) along this package.
+
 ## Tool Example
 Client/Tool example (no dynamic flag url or config) [sampleTool](sampleTool/main.go)
 
@@ -21,16 +23,18 @@ import (
 	"os"
 
 	"fortio.org/cli"
+	"fortio.org/duration"
 	"fortio.org/log"
 )
 
 func main() {
 	myFlag := flag.String("myflag", "default", "my flag")
+	durationExample := duration.Flag("duration", 1*duration.Day, "example of `duration` flag with days support")
 	cli.MinArgs = 2
 	cli.MaxArgs = 4
 	cli.Main() // Will have either called cli.ExitFunction or everything is valid
 	// Next line output won't show when passed -quiet
-	log.Infof("Info test, -myflag is %q", *myFlag)
+	log.Infof("Info test, -myflag is %q and duration is %v", *myFlag, duration.Duration(*durationExample))
 	// This always shows
 	log.Printf("Hello world, version %s, args %v", cli.ShortVersion, flag.Args())
 	// This shows and is colorized and structured, unless loglevel is set to critical.
@@ -48,6 +52,8 @@ sampleTool 1.2.0 usage:
 or 1 of the special arguments
 	sampleTool {help|version|buildinfo}
 flags:
+  -duration duration
+        example of duration flag with days support (default 1d)
   -logger-force-color
     	Force color output even if stderr isn't a terminal
   -logger-no-color
@@ -71,8 +77,8 @@ or normal case:
 
 Old style, no colors:
 ```bash
-$ sampleTool -logger-no-color a b
-17:20:41 [I] Info test, -myflag is "default"
+$ sampleTool -logger-no-color a b -duration 1w3h
+17:20:41 [I] Info test, -myflag is "default" and duration is 1w3h
 17:20:41 Hello world, version dev, args [a b]
 17:20:41 [E] Error test, myflag="default", num_args="2", args="[a b]"
 ```
