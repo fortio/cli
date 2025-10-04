@@ -26,6 +26,7 @@ func main() {
 		log.Attr("num_args", len(flag.Args())),
 		log.Attr("args", flag.Args()))
 	if *doWait {
+		log.Config.GoroutineID = true // need to do that _before_ starting other goroutines to get correct logging
 		log.Infof("Waiting for ^C (or kill) to exit")
 		cli.UntilInterrupted()
 		log.Infof("Now done...")

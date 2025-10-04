@@ -260,10 +260,12 @@ func PluralExt(i int, noun string, ext string) string {
 // Kubernetes for instance sends a SIGTERM before killing a pod.
 // You can place your clean shutdown code after this call in the main().
 // This assumes there is another go routine doing something (like a server).
+// Using this implies there should be another goroutine at least, so you need to put
+// back goroutine logging (vs what log.SetDefaultsForClientTools() does) by calling
+// this before starting any other goroutine so there is no race condition:
+//
+//	log.Config.GoroutineID = true
 func UntilInterrupted() {
-	// if UntilInterrupted is called, it implies there should be another goroutine at least.
-	// so we put back that logging (vs what log.SetDefaultsForClientTools() does).
-	log.Config.GoroutineID = true
 	// listen for interrupt signal
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
