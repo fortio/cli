@@ -129,7 +129,7 @@ func EnvHelp(w io.Writer) {
 // For a server with dynamic flags, call ServerMain instead.
 // Will either have called [ExitFunction] (defaults to [os.Exit])
 // or returned if all validations passed.
-func Main() {
+func Main() { //nolint: funlen // just over 70 lines
 	quietFlag := flag.Bool("quiet", false,
 		"Quiet mode, sets loglevel to Error (quietly) to reduces the output")
 	flag.BoolVar(&log.Config.ForceColor, "logger-force-color", false,
