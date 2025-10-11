@@ -160,7 +160,6 @@ func Main() {
 		ArgsHelp = " " + ArgsHelp
 	}
 	if !ServerMode {
-		log.SetDefaultsForClientTools()
 		log.LoggerStaticFlagSetup("loglevel")
 	}
 	flag.CommandLine.Usage = func() { usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
@@ -197,6 +196,12 @@ func Main() {
 	os.Stderr.WriteString(log.Colors.BrightRed)
 	flag.Parse()
 	os.Stderr.WriteString(log.Colors.Reset)
+	if *quietFlag {
+		log.SetLogLevelQuiet(log.Error)
+	}
+	if !ServerMode {
+		log.SetDefaultsForClientTools()
+	}
 	if *nocolor {
 		// Don't override the env if the flag isn't set
 		// (downside is if LOGGER_CONSOLE_COLOR is set to false, this -logger-no-color=false can't override it)
@@ -223,9 +228,6 @@ func Main() {
 		}
 		errArgCount(exactly, MaxArgs, nArgs)
 		return // not typically reached, unless ExitFunction doesn't exit
-	}
-	if *quietFlag {
-		log.SetLogLevelQuiet(log.Error)
 	}
 }
 
