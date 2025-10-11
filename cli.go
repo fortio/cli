@@ -129,7 +129,7 @@ func EnvHelp(w io.Writer) {
 // For a server with dynamic flags, call ServerMain instead.
 // Will either have called [ExitFunction] (defaults to [os.Exit])
 // or returned if all validations passed.
-func Main() {
+func Main() { //nolint: funlen // just over 70 lines
 	quietFlag := flag.Bool("quiet", false,
 		"Quiet mode, sets loglevel to Error (quietly) to reduces the output")
 	flag.BoolVar(&log.Config.ForceColor, "logger-force-color", false,
@@ -160,7 +160,6 @@ func Main() {
 		ArgsHelp = " " + ArgsHelp
 	}
 	if !ServerMode {
-		log.SetDefaultsForClientTools()
 		log.LoggerStaticFlagSetup("loglevel")
 	}
 	flag.CommandLine.Usage = func() { usage(os.Stderr, "") } // flag handling will exit 1 after calling usage, except for -h/-help
@@ -197,6 +196,12 @@ func Main() {
 	os.Stderr.WriteString(log.Colors.BrightRed)
 	flag.Parse()
 	os.Stderr.WriteString(log.Colors.Reset)
+	if *quietFlag {
+		log.SetLogLevelQuiet(log.Error)
+	}
+	if !ServerMode {
+		log.SetDefaultsForClientTools()
+	}
 	if *nocolor {
 		// Don't override the env if the flag isn't set
 		// (downside is if LOGGER_CONSOLE_COLOR is set to false, this -logger-no-color=false can't override it)
@@ -223,9 +228,6 @@ func Main() {
 		}
 		errArgCount(exactly, MaxArgs, nArgs)
 		return // not typically reached, unless ExitFunction doesn't exit
-	}
-	if *quietFlag {
-		log.SetLogLevelQuiet(log.Error)
 	}
 }
 
