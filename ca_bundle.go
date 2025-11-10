@@ -4,7 +4,6 @@
 // See LICENSE
 
 //go:build !no_tls_fallback && !no_net
-// +build !no_tls_fallback,!no_net
 
 package cli // import "fortio.org/cli"
 

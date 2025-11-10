@@ -146,9 +146,11 @@ func Main() { //nolint: funlen // just over 70 lines
 		MaxArgs = MinArgs
 	}
 	if ArgsHelp == "" {
+		var sb strings.Builder
 		for i := 1; i <= MinArgs; i++ {
-			ArgsHelp += fmt.Sprintf(" arg%d", i)
+			sb.WriteString(fmt.Sprintf(" arg%d", i))
 		}
+		ArgsHelp += sb.String()
 		if MaxArgs < 0 {
 			ArgsHelp += " ..."
 		} else if MaxArgs > MinArgs {
