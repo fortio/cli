@@ -30,36 +30,44 @@ import (
 // These variables is how to setup the arguments, flags and usage parsing for [Main] and [ServerMain].
 // At minimum the MinArgs should be set.
 var (
-	// Out parameters:
+	// Out parameters.
+
+	// ShortVersion is x.y.z from tag/install.
 	// *Version will be filled automatically by the cli package, using [fortio.org/version.FromBuildInfo()].
-	ShortVersion string // x.y.z from tag/install
-	LongVersion  string // version plus go version plus OS/arch
-	FullVersion  string // LongVersion plus build date and git sha
-	Command      string // first argument, if [CommandBeforeFlags] is true.
+	ShortVersion string
+	// LongVersion is ShortVersion plus go version plus OS/arch.
+	LongVersion string
+	// FullVersion is LongVersion plus build date and git sha and all the module versions.
+	FullVersion string
+	// Command is the first argument, if [CommandBeforeFlags] is true.
+	Command string
+
 	// Following can/should be specified.
-	ProgramName string // Used at the beginning of Usage()
-	// Optional for programs using subcommand, command will be set in [Command].
+
+	// ProgramName is used at the beginning of Usage() and can/should be specified.
+	ProgramName string
+	// CommandBeforeFlags is optional for programs using subcommand, command will be set in [Command].
 	// If you wish to replace the help default colorize `command` with something else set CommandHelp.
 	CommandBeforeFlags bool
-	// Cli usage/arguments example, ie "url1..." program name and "[flags]" will be added"
+	// ArgsHelp is cli usage/arguments example, ie "url1..." program name and "[flags]" will be added"
 	// can include \n for additional details in the Usage() before the flags are dumped.
 	ArgsHelp string
-	// Command help will be used instead of purple "command " in help text for cli that have a
+	// CommandHelp will be used instead of purple "command " in help text for cli that have a
 	// command before the flags (when [CommandBeforeFlags] is true). For instance you could use
 	// cli.CommandHelp = "{" + cli.ColorJoin(log.Colors.Purple, "a", "b", "c") + "}"
 	// for colorize {a|b|c} in the help before [flags].
 	CommandHelp string
 	MinArgs     int // Minimum number of arguments expected, not counting (optional) command.
 	MaxArgs     int // Maximum number of arguments expected. 0 means same as MinArgs. -1 means no limit.
-	// If not set to true, will setup static loglevel flag and logger output for client tools.
+	// ServerMode if not set to true, will setup static loglevel flag and logger output for client tools.
 	ServerMode = false
-	// Override this to change the exit function (for testing), will be applied to log.Fatalf too.
+	// ExitFunction can be overridden to change the exit function (for testing), will be applied to log.Fatalf too.
 	ExitFunction = os.Exit
-	// Hook to call before flag.Parse() - for instance to use ChangeFlagDefaults for logger flags etc.
+	// BeforeFlagParseHook is a hook to call before flag.Parse() - for instance to use ChangeFlagDefaults for logger flags etc.
 	BeforeFlagParseHook = func() {}
 	// Calculated base exe name from args (will be used if ProgramName if not set).
 	baseExe string
-	// List of functions to call for env help.
+	// EnvHelpFuncs is a list of functions to call for env help.
 	EnvHelpFuncs = []func(w io.Writer){log.EnvHelp}
 )
 
@@ -146,9 +154,11 @@ func Main() { //nolint: funlen // just over 70 lines
 		MaxArgs = MinArgs
 	}
 	if ArgsHelp == "" {
+		var sb strings.Builder
 		for i := 1; i <= MinArgs; i++ {
-			ArgsHelp += fmt.Sprintf(" arg%d", i)
+			sb.WriteString(fmt.Sprintf(" arg%d", i))
 		}
+		ArgsHelp += sb.String()
 		if MaxArgs < 0 {
 			ArgsHelp += " ..."
 		} else if MaxArgs > MinArgs {
@@ -235,7 +245,7 @@ func errArgCount(prefix string, expected, actual int) {
 	ErrUsage("%s %d %s expected, got %d", prefix, expected, Plural(expected, "argument"), actual)
 }
 
-// Show usage and error message on stderr and calls [ExitFunction] with code 1.
+// ErrUsage shows usage and error message on stderr and calls [ExitFunction] with code 1.
 func ErrUsage(msg string, args ...any) {
 	usage(os.Stderr, log.Colors.BrightRed+msg+log.Colors.Reset, args...)
 	ExitFunction(1)
